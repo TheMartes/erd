@@ -1,14 +1,7 @@
 package main
 
 import (
-	"context"
-	"log"
-	"strconv"
-	"strings"
-	"sync"
-
 	"github.com/bxcodec/faker/v3"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/themartes/offer-search/config"
 	"github.com/themartes/offer-search/replication"
 	"github.com/themartes/offer-search/servicedaemon"
@@ -17,43 +10,12 @@ import (
 func main() {
 	config.InitEnv()
 
-	client := servicedaemon.GetElasticClient()
+	// Ultimately this will come from config
+	// but for dev purpose we will generate new one
+	// each time replication will start
 	indicesName := faker.Word()
-
-	// this will create github indices
 	servicedaemon.ConfigureDaemon(indicesName)
 
-	wg := sync.WaitGroup{}
 	data := replication.GenerateFakeData(500)
-
-	for index, title := range data {
-		wg.Add(1)
-
-		go func(index int, title string, indicesName string) {
-			defer wg.Done()
-
-			var b strings.Builder
-			b.WriteString(`{"title" : "`)
-			b.WriteString(title)
-			b.WriteString(`"}`)
-
-			req := esapi.IndexRequest{
-				Index:      indicesName,
-				DocumentID: strconv.Itoa(index),
-				Body:       strings.NewReader(b.String()),
-			}
-
-			res, err := req.Do(context.Background(), client)
-
-			if err != nil {
-				log.Fatalf("err %s", err)
-			}
-
-			defer res.Body.Close()
-		}(index, title, indicesName)
-	}
-
-	wg.Wait()
-
-	replication.StartReplicationDaemon()
+	replication.StartReplicationDaemon(data, indicesName)
 }
