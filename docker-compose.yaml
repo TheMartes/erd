@@ -1,0 +1,22 @@
+---
+version: "3.9"
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/opt/offer-search
+
+  elastic:
+    image: docker.io/bitnami/elasticsearch:7
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - 'elasticsearch_data:/bitnami/elasticsearch/data'
+
+volumes:
+  elasticsearch_data:
+    driver: local
