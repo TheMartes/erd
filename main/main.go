@@ -23,15 +23,10 @@ func main() {
 	// this will create github indices
 	servicedaemon.ConfigureDaemon(indicesName)
 
-	var fakeTitles []string
-
-	for i := 0; i < 500; i++ {
-		fakeTitles = append(fakeTitles, faker.Word())
-	}
-
 	wg := sync.WaitGroup{}
+	data := replication.GenerateFakeData(500)
 
-	for index, title := range fakeTitles {
+	for index, title := range data {
 		wg.Add(1)
 
 		go func(index int, title string, indicesName string) {
