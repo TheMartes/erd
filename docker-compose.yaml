@@ -16,12 +16,19 @@ services:
       - '9300:9300'
     volumes:
       - 'elasticsearch_data:/bitnami/elasticsearch/data'
+
   grafana:
     image: grafana/grafana:8.2.6
     env_file:
       - .grafana/config
     ports:
       - '3000:3000'
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - '9090:9090'
+
 
 volumes:
   elasticsearch_data:
