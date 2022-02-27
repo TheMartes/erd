@@ -1,4 +1,4 @@
-module github.com/themartes/offer-search
+module github.com/themartes/erd
 
 go 1.17
 

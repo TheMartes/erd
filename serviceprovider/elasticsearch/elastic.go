@@ -1,14 +1,14 @@
-package servicedaemon
+package esp
 
 import (
 	"fmt"
 	"log"
 
 	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/themartes/offer-search/config"
+	"github.com/themartes/erd/config"
 )
 
-func GetElasticClient() *elasticsearch.Client {
+func GetClient() *elasticsearch.Client {
 	es, err := elasticsearch.NewClient(config.Cfg)
 
 	if err != nil {
@@ -19,7 +19,7 @@ func GetElasticClient() *elasticsearch.Client {
 }
 
 func ConfigureDaemon(indicesName string) {
-	es := GetElasticClient()
+	es := GetClient()
 
 	es.Indices.Create(indicesName)
 	fmt.Println("Indices name:", indicesName)

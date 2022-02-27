@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/bxcodec/faker/v3"
-	"github.com/themartes/offer-search/config"
-	"github.com/themartes/offer-search/replication"
-	"github.com/themartes/offer-search/servicedaemon"
+	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/replication"
+	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	// but for dev purpose we will generate new one
 	// each time replication will start
 	indicesName := faker.Word()
-	servicedaemon.ConfigureDaemon(indicesName)
+	esp.ConfigureDaemon(indicesName)
 
 	data := replication.GenerateFakeData(500)
 	replication.StartReplicationDaemon(data, indicesName)

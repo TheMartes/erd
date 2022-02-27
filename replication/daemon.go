@@ -9,11 +9,11 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
-	"github.com/themartes/offer-search/servicedaemon"
+	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
 )
 
 var (
-	client      *elasticsearch.Client = servicedaemon.GetElasticClient()
+	client      *elasticsearch.Client = esp.GetClient()
 	indicesName string
 )
 
