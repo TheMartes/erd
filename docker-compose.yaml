@@ -8,6 +8,8 @@ services:
       target: dev
     volumes:
       - .:/opt/offer-search
+    depends_on:
+      - elastic
 
   elastic:
     image: docker.io/bitnami/elasticsearch:7
