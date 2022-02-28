@@ -31,7 +31,6 @@ services:
     ports:
       - '9090:9090'
 
-
 volumes:
   elasticsearch_data:
     driver: local

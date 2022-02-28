@@ -14,7 +14,7 @@ func main() {
 	// but for dev purpose we will generate new one
 	// each time replication will start
 	indicesName := faker.Word()
-	esp.ConfigureDaemon(indicesName)
+	esp.FindOrCreateIndices(indicesName)
 
 	data := replication.GenerateFakeData(500)
 	replication.StartReplicationDaemon(data, indicesName)

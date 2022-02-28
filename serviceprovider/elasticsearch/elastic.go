@@ -1,7 +1,6 @@
 package esp
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/elastic/go-elasticsearch/v7"
@@ -18,9 +17,9 @@ func GetClient() *elasticsearch.Client {
 	return es
 }
 
-func ConfigureDaemon(indicesName string) {
+func FindOrCreateIndices(name string) {
 	es := GetClient()
 
-	es.Indices.Create(indicesName)
-	fmt.Println("Indices name:", indicesName)
+	es.Indices.Create(name)
+	log.Print("Writing to index: ", name)
 }
