@@ -1,9 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bxcodec/faker/v3"
 	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/replication"
 	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
 )
 
@@ -16,6 +17,14 @@ func main() {
 	indicesName := faker.Word()
 	esp.FindOrCreateIndices(indicesName)
 
-	data := replication.GenerateFakeData(500)
-	replication.StartReplicationDaemon(data, indicesName)
+	var arr []string
+
+	for i := 0; i < 1000000; i++ {
+		arr = append(arr, faker.Word())
+	}
+
+	fmt.Println("Done.", len(arr))
+
+	//data := replication.GenerateFakeData(500)
+	//replication.StartReplicationDaemon(data, indicesName)
 }

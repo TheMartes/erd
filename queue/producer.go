@@ -3,6 +3,7 @@ package queue
 import (
 	"log"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -14,8 +15,8 @@ func Populate() {
 		log.Fatalf("err occured %s", err)
 	}
 
-	msgBody := []byte("hello")
-	topicName := "world"
+	msgBody := []byte(faker.Word())
+	topicName := "hello"
 
 	err = producer.Publish(topicName, msgBody)
 

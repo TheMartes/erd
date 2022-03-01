@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -21,7 +22,7 @@ func (h *messageHandler) HandleMessage(m *nsq.Message) error {
 
 func Init() {
 	config := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer("test", "test", config)
+	consumer, err := nsq.NewConsumer(faker.Word(), faker.Word(), config)
 
 	if err != nil {
 		log.Fatal(err)
