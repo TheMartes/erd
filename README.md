@@ -9,6 +9,7 @@ fast, scalable & resilient replication daemon for elasticsearch
 - [ ] Create MSG Producer for replication data
 - [ ] Split data into 2 Queues, 1 for indexing, 1 for updating
 - [ ] Bulk Request after X Documents (Load from config)
+- [ ] Fix loading from config
 
 ## Planned Features (updated - 3.2022)
 - Support for Kafka, RabbitMQ
