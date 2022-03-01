@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"errors"
 	"log"
 	"os"
 	"os/signal"
@@ -17,7 +16,7 @@ func (h *messageHandler) HandleMessage(m *nsq.Message) error {
 		return nil
 	}
 
-	return errors.New("")
+	return nil
 }
 
 func Init() {
