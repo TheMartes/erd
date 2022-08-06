@@ -2,10 +2,19 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"runtime"
+	"sync"
+	"time"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/replication"
 	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
+)
+
+var (
+	numberOfCores = runtime.NumCPU()
 )
 
 func main() {
@@ -15,16 +24,26 @@ func main() {
 	// but for dev purpose we will generate new one
 	// each time replication will start
 	indicesName := faker.Word()
+
+	var indices []string
+	indices = append(indices, "_all")
+
+	wg := new(sync.WaitGroup)
+	wg.Add(numberOfCores)
+
+	log.Println("Number of Workers:", numberOfCores)
+
+	esp.GetClient().Indices.Delete(indices)
+
 	esp.FindOrCreateIndices(indicesName)
 
-	var arr []string
+	arr := replication.GenerateFakeData(100000)
 
-	for i := 0; i < 1000000; i++ {
-		arr = append(arr, faker.Word())
-	}
+	start := time.Now().UTC()
 
-	fmt.Println("Done.", len(arr))
+	replication.InitialLoad(arr, indicesName, wg)
 
-	//data := replication.GenerateFakeData(500)
-	//replication.StartReplicationDaemon(data, indicesName)
+	dur := time.Since(start).Milliseconds()
+
+	fmt.Println("Cycle done in", dur, "ms")
 }
