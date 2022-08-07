@@ -20,6 +20,11 @@ func GetClient() *elasticsearch.Client {
 func FindOrCreateIndices(name string) {
 	es := GetClient()
 
-	es.Indices.Create(name)
+	_, err := es.Indices.Create(name)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	log.Print("Writing to index: ", name)
 }
