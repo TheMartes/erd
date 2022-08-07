@@ -4,9 +4,9 @@ fast, scalable & resilient replication daemon for elasticsearch
 ## v0.1
 
 - [ ] Implement Replication Caching system
-- [ ] Implement Msg Queue Consumption
+- [x] Implement Msg Queue Consumption
 - [x] Split Load into Go routines
-- [ ] Create MSG Producer for replication data
+- [x] Create MSG Producer for replication data
 - [ ] Split data into 2 Queues, 1 for indexing, 1 for updating
 - [x] Bulk Request after X Documents (Load from config)
 - [x] Fix loading from config

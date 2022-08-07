@@ -1,36 +1,47 @@
 package queue
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
+	"time"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/nsqio/go-nsq"
 	"github.com/themartes/erd/config"
 	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/replication"
 )
 
-type messageHandler struct{}
+var (
+	bufferSize = 20000
+	msgBuffer  []string
+)
 
-func (h *messageHandler) HandleMessage(m *nsq.Message) error {
-	if len(m.Body) == 0 {
-		return nil
-	}
-
-	return nil
-}
-
-func Init() {
+// StartConsumer :)
+func StartConsumer() {
 	nsqconfig := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer(faker.Word(), faker.Word(), nsqconfig)
+	consumer, err := nsq.NewConsumer(
+		config.GetEnvValue(envparams.NSQTopic),
+		"consumer",
+		nsqconfig,
+	)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	consumer.AddHandler(&messageHandler{})
+	consumer.AddConcurrentHandlers(nsq.HandlerFunc(func(m *nsq.Message) error {
+		if len(m.Body) == 0 {
+			return nil
+		}
+
+		processMessage(string(m.Body[:]))
+
+		return nil
+	}), runtime.NumCPU())
 
 	err = consumer.ConnectToNSQLookupd(config.GetEnvValue(envparams.NSQLookupDaemonURL))
 
@@ -44,4 +55,22 @@ func Init() {
 	<-sigChan
 
 	consumer.Stop()
+}
+
+func processMessage(payload string) {
+	msgBuffer = append(msgBuffer, payload)
+
+	if len(msgBuffer) >= bufferSize {
+		data := msgBuffer
+
+		// Clear buffer
+		msgBuffer = []string{}
+
+		start := time.Now().UTC()
+
+		replication.ReplicateBulkIndex(data)
+
+		dur := time.Since(start).Milliseconds()
+		fmt.Println("Cycle done in", dur, "ms")
+	}
 }
