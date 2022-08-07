@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -14,9 +13,7 @@ import (
 )
 
 // ReplicateBulkIndex :)
-func ReplicateBulkIndex(data []string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func ReplicateBulkIndex(data []string) {
 	var (
 		docs            []*Doc
 		countSuccessful uint64

@@ -3,13 +3,13 @@ package queue
 import (
 	"log"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/nsqio/go-nsq"
 	"github.com/themartes/erd/config"
 	"github.com/themartes/erd/config/envparams"
 )
 
-func Populate() {
+// Populate :)
+func Populate(data []string) {
 	nsqconfig := nsq.NewConfig()
 	producerURL := config.GetEnvValue(envparams.NSQProducerURL)
 	producer, err := nsq.NewProducer(producerURL, nsqconfig)
@@ -18,13 +18,15 @@ func Populate() {
 		log.Fatalf("err occured %s", err)
 	}
 
-	msgBody := []byte(faker.Word())
-	topicName := "hello"
+	topicName := config.GetEnvValue(envparams.NSQTopic)
 
-	err = producer.Publish(topicName, msgBody)
+	for _, msg := range data {
+		msgBody := []byte(msg)
+		err = producer.Publish(topicName, msgBody)
 
-	if err != nil {
-		log.Fatal(err)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	producer.Stop()

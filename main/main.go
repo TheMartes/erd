@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"runtime"
-	"sync"
-	"time"
 
 	"github.com/themartes/erd/config"
 	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/queue"
 	"github.com/themartes/erd/replication"
 	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
 )
@@ -23,9 +21,6 @@ func main() {
 	var indices []string
 	indices = append(indices, "_all")
 
-	wg := new(sync.WaitGroup)
-	wg.Add(numberOfCores)
-
 	log.Println("Number of Workers:", numberOfCores)
 
 	_, err := esp.GetClient().Indices.Delete(indices)
@@ -36,13 +31,12 @@ func main() {
 
 	esp.FindOrCreateIndices(indicesName)
 
-	arr := replication.GenerateFakeData(100000)
+	var arr []string
 
-	start := time.Now().UTC()
+	if config.GetEnvValue(envparams.AppEnv) == "dev" {
+		arr = replication.GenerateFakeData(50000)
+		go queue.Populate(arr)
+	}
 
-	replication.InitialLoad(arr, indicesName, wg)
-
-	dur := time.Since(start).Milliseconds()
-
-	fmt.Println("Cycle done in", dur, "ms")
+	queue.StartConsumer()
 }
