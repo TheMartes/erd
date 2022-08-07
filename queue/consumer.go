@@ -8,6 +8,8 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/nsqio/go-nsq"
+	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/config/envparams"
 )
 
 type messageHandler struct{}
@@ -21,8 +23,8 @@ func (h *messageHandler) HandleMessage(m *nsq.Message) error {
 }
 
 func Init() {
-	config := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer(faker.Word(), faker.Word(), config)
+	nsqconfig := nsq.NewConfig()
+	consumer, err := nsq.NewConsumer(faker.Word(), faker.Word(), nsqconfig)
 
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +32,7 @@ func Init() {
 
 	consumer.AddHandler(&messageHandler{})
 
-	err = consumer.ConnectToNSQLookupd("nsqlookupd:4161")
+	err = consumer.ConnectToNSQLookupd(config.GetEnvValue(envparams.NSQLookupDaemonURL))
 
 	if err != nil {
 		log.Fatal(err)

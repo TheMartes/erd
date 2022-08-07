@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/config/envparams"
 	"github.com/themartes/erd/replication"
 	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
 )
@@ -18,12 +18,7 @@ var (
 )
 
 func main() {
-	config.InitEnv()
-
-	// Ultimately this will come from config
-	// but for dev purpose we will generate new one
-	// each time replication will start
-	indicesName := faker.Word()
+	indicesName := config.GetEnvValue(envparams.ReplicationIndex)
 
 	var indices []string
 	indices = append(indices, "_all")
