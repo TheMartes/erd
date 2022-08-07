@@ -5,11 +5,14 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/nsqio/go-nsq"
+	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/config/envparams"
 )
 
 func Populate() {
-	config := nsq.NewConfig()
-	producer, err := nsq.NewProducer("nsqlookupd:4161", config)
+	nsqconfig := nsq.NewConfig()
+	producerURL := config.GetEnvValue(envparams.NSQProducerURL)
+	producer, err := nsq.NewProducer(producerURL, nsqconfig)
 
 	if err != nil {
 		log.Fatalf("err occured %s", err)

@@ -2,30 +2,21 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 )
-
-type Config struct {
-	ELASTICSEARCH_URL string
-}
 
 const (
 	ep string = ".env"
 )
 
-func InitEnv() {
+func GetEnvValue(param string) string {
 	err := godotenv.Load(ep)
 
 	if err != nil {
-		log.Fatal("err loading .env")
-	}
-}
-
-func GetConfig() Config {
-	config := Config{
-		ELASTICSEARCH_URL: "ELASTICSEARCH_URL",
+		log.Fatal(err)
 	}
 
-	return config
+	return os.Getenv(param)
 }

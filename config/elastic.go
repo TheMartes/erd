@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/themartes/erd/config/envparams"
 )
 
 var Cfg elasticsearch.Config = elasticsearch.Config{
 	Addresses: []string{
-		"http://elastic:9200",
+		GetEnvValue(envparams.ElasticsearchURL),
 	},
 	Transport: &http.Transport{
 		MaxIdleConnsPerHost:   10,
