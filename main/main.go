@@ -33,7 +33,11 @@ func main() {
 
 	log.Println("Number of Workers:", numberOfCores)
 
-	esp.GetClient().Indices.Delete(indices)
+	_, err := esp.GetClient().Indices.Delete(indices)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	esp.FindOrCreateIndices(indicesName)
 

@@ -27,7 +27,11 @@ func WriteToCache(key string) bool {
 }
 
 func WriteToDisk() {
-	file.WriteLines(cache, cachePath)
+	err := file.WriteLines(cache, cachePath)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func PopFromDisk() {
