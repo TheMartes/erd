@@ -3,6 +3,7 @@ package replication
 import (
 	"github.com/bxcodec/faker/v3"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -28,7 +29,7 @@ func ConvertToMongoCompatible(arr []string) []mongo.WriteModel {
 			}},
 		}
 
-		wm := mongo.NewUpdateOneModel().SetFilter(bson.D{{"_id", i}}).SetUpdate(update).SetUpsert(true)
+		wm := mongo.NewUpdateOneModel().SetFilter(bson.D{primitive.E{Key: "_id", Value: i}}).SetUpdate(update).SetUpsert(true)
 
 		models = append(models, wm)
 	}
