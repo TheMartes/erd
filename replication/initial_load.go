@@ -2,10 +2,10 @@ package replication
 
 import (
 	"github.com/elastic/go-elasticsearch/v7"
-	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
+	"github.com/themartes/erd/persistance"
 )
 
 var (
-	client      *elasticsearch.Client = esp.GetClient()
+	client      *elasticsearch.Client = persistance.GetElasticClient()
 	indicesName string
 )

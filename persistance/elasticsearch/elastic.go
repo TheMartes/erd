@@ -1,13 +1,16 @@
-package esp
+package elasticserviceprovider
 
 import (
 	"log"
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/config/envparams"
 )
 
-func GetClient() *elasticsearch.Client {
+type Elastic struct{}
+
+func (e Elastic) GetClient() *elasticsearch.Client {
 	es, err := elasticsearch.NewClient(config.Cfg)
 
 	if err != nil {
@@ -17,8 +20,8 @@ func GetClient() *elasticsearch.Client {
 	return es
 }
 
-func FindOrCreateIndices(name string) {
-	es := GetClient()
+func FindOrCreateIndices(es *elasticsearch.Client) {
+	name := config.GetEnvValue(envparams.ReplicationIndex)
 
 	_, err := es.Indices.Create(name)
 

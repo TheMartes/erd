@@ -1,6 +1,10 @@
 package replication
 
-import "github.com/bxcodec/faker/v3"
+import (
+	"github.com/bxcodec/faker/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type FakeData []string
 
@@ -12,4 +16,22 @@ func GenerateFakeData(cycles int) FakeData {
 	}
 
 	return fakeTitles
+}
+
+func ConvertToMongoCompatible(arr []string) []mongo.WriteModel {
+	models := []mongo.WriteModel{}
+
+	for i, title := range arr {
+		update := bson.D{
+			bson.E{Key: "$set", Value: bson.D{
+				bson.E{Key: "title", Value: title},
+			}},
+		}
+
+		wm := mongo.NewUpdateOneModel().SetFilter(bson.D{{"_id", i}}).SetUpdate(update).SetUpsert(true)
+
+		models = append(models, wm)
+	}
+
+	return models
 }
