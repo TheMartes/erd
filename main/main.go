@@ -31,5 +31,7 @@ func main() {
 
 	elasticserviceprovider.FindOrCreateIndices(persistance.GetElasticClient())
 
+	go queue.StartProducer()
+
 	queue.StartConsumer()
 }

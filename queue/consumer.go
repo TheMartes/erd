@@ -1,13 +1,11 @@
 package queue
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
-	"time"
 
 	"github.com/nsqio/go-nsq"
 	"github.com/themartes/erd/config"
@@ -16,7 +14,7 @@ import (
 )
 
 var (
-	bufferSize = 20000
+	bufferSize = 2000
 	msgBuffer  []string
 )
 
@@ -66,11 +64,6 @@ func processMessage(payload string) {
 		// Clear buffer
 		msgBuffer = []string{}
 
-		start := time.Now().UTC()
-
-		replication.ReplicateBulkIndex(data)
-
-		dur := time.Since(start).Milliseconds()
-		fmt.Println("Cycle done in", dur, "ms")
+		go replication.ReplicateBulkIndex(data)
 	}
 }

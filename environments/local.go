@@ -20,7 +20,10 @@ func (l Local) InitLocalEnv() {
 	mongoClient := persistance.GetMongoClient()
 	db := config.GetEnvValue(envparams.MongoDB)
 	collection := config.GetEnvValue(envparams.MongoCollection)
-	arr := replication.GenerateFakeData(50000)
+	arr := replication.GenerateFakeData(10000)
+
+	mongoClient.Database(db).Collection(collection).Drop(context.TODO())
+	mongoClient.Database(db).CreateCollection(context.TODO(), collection)
 
 	instance := mongoserviceprovider.GetCollectionFromDB(mongoClient, db, collection)
 
