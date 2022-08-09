@@ -8,7 +8,7 @@ import (
 	initenv "github.com/themartes/erd/env/init"
 	"github.com/themartes/erd/persistance"
 	elasticserviceprovider "github.com/themartes/erd/persistance/elasticsearch"
-	"github.com/themartes/erd/queue"
+	"github.com/themartes/erd/worker"
 )
 
 var (
@@ -30,13 +30,6 @@ func main() {
 
 	elasticserviceprovider.FindOrCreateIndices(persistance.GetElasticClient())
 
-	qd := queue.QueueDaemon{
-		SourceDB:         "mongodb.fluffy",
-		SourceCollection: "buffy",
-		ReplicationIndex: env.Params.ReplicationIndex,
-	}
-
-	go queue.StartProducer(&qd)
-
-	queue.StartConsumer(&qd)
+	worker := worker.CreateReplicationWorker("mongodb", "fluffy", "buffy", "erd")
+	worker.StartReplication()
 }

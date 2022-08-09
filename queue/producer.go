@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/nsqio/go-nsq"
@@ -12,7 +13,7 @@ import (
 )
 
 // Start producer
-func StartProducer(qd *QueueDaemon) {
+func StartProducer(dbengine string, sourcedb string, producer *nsq.Producer) {
 	db := env.Params.MongoDB
 	collection := env.Params.MongoCollection
 
@@ -36,17 +37,11 @@ func StartProducer(qd *QueueDaemon) {
 		producerData = append(producerData, result["title"].(string))
 	}
 
-	nsqconfig := nsq.NewConfig()
-	producerURL := env.Params.NSQProducerURL
-	producer, err := nsq.NewProducer(producerURL, nsqconfig)
-
-	if err != nil {
-		log.Fatalf("err occured %s", err)
-	}
+	topicName := fmt.Sprintf("%s.%s", dbengine, sourcedb)
 
 	for _, msg := range producerData {
 		msgBody := []byte(msg)
-		err = producer.Publish(qd.SourceDB, msgBody)
+		err = producer.Publish(topicName, msgBody)
 
 		if err != nil {
 			log.Fatal(err)
@@ -55,7 +50,7 @@ func StartProducer(qd *QueueDaemon) {
 }
 
 // Populate for local development
-func Populate(data []string, qd *QueueDaemon) {
+func Populate(data []string, dbengine string, sourcedb string) {
 	nsqconfig := nsq.NewConfig()
 	producerURL := env.Params.NSQProducerURL
 	producer, err := nsq.NewProducer(producerURL, nsqconfig)
@@ -64,9 +59,11 @@ func Populate(data []string, qd *QueueDaemon) {
 		log.Fatalf("err occured %s", err)
 	}
 
+	topicName := fmt.Sprintf("%s.%s", dbengine, sourcedb)
+
 	for _, msg := range data {
 		msgBody := []byte(msg)
-		err = producer.Publish(qd.SourceDB, msgBody)
+		err = producer.Publish(topicName, msgBody)
 
 		if err != nil {
 			log.Fatal(err)

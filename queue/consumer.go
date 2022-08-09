@@ -5,8 +5,11 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"syscall"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/nsqio/go-nsq"
 	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/replication"
@@ -15,21 +18,11 @@ import (
 var (
 	bufferSize = 2000
 	msgBuffer  []string
+	timeout    = time.Now()
 )
 
 // StartConsumer :)
-func StartConsumer(qd *QueueDaemon) {
-	nsqconfig := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer(
-		qd.SourceDB,
-		qd.SourceCollection,
-		nsqconfig,
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func StartConsumer(engine string, sourcedb string, collection string, consumer *nsq.Consumer) {
 	consumer.AddConcurrentHandlers(nsq.HandlerFunc(func(m *nsq.Message) error {
 		if len(m.Body) == 0 {
 			return nil
@@ -40,7 +33,12 @@ func StartConsumer(qd *QueueDaemon) {
 		return nil
 	}), runtime.NumCPU())
 
-	err = consumer.ConnectToNSQLookupd(env.Params.NSQLookupDaemonURL)
+	cron := gocron.NewScheduler(time.UTC)
+	cron.Every(5).Seconds().Do(idleQueueCheck)
+
+	cron.StartAsync()
+
+	err := consumer.ConnectToNSQLookupd(env.Params.NSQLookupDaemonURL)
 
 	if err != nil {
 		log.Fatal(err)
@@ -64,5 +62,28 @@ func processMessage(payload string) {
 		msgBuffer = []string{}
 
 		go replication.ReplicateBulkIndex(data)
+
+		timeout = time.Now()
+	}
+}
+
+func idleQueueCheck() {
+	queueTimeout, err := strconv.Atoi(env.Params.NSQForceMessageProcessingTimeout)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if time.Since(timeout).Seconds() >= float64(queueTimeout) {
+		data := msgBuffer
+
+		// Clear buffer
+		msgBuffer = []string{}
+
+		go replication.ReplicateBulkIndex(data)
+
+		timeout = time.Now()
+
+		log.Println("Queue population not high enough, forcing message processing...")
 	}
 }
