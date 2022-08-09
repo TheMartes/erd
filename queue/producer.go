@@ -12,7 +12,7 @@ import (
 )
 
 // Start producer
-func StartProducer() {
+func StartProducer(qd *QueueDaemon) {
 	db := env.Params.MongoDB
 	collection := env.Params.MongoCollection
 
@@ -44,11 +44,9 @@ func StartProducer() {
 		log.Fatalf("err occured %s", err)
 	}
 
-	topicName := env.Params.NSQTopic
-
 	for _, msg := range producerData {
 		msgBody := []byte(msg)
-		err = producer.Publish(topicName, msgBody)
+		err = producer.Publish(qd.SourceDB, msgBody)
 
 		if err != nil {
 			log.Fatal(err)
@@ -57,7 +55,7 @@ func StartProducer() {
 }
 
 // Populate for local development
-func Populate(data []string) {
+func Populate(data []string, qd *QueueDaemon) {
 	nsqconfig := nsq.NewConfig()
 	producerURL := env.Params.NSQProducerURL
 	producer, err := nsq.NewProducer(producerURL, nsqconfig)
@@ -66,11 +64,9 @@ func Populate(data []string) {
 		log.Fatalf("err occured %s", err)
 	}
 
-	topicName := env.Params.NSQTopic
-
 	for _, msg := range data {
 		msgBody := []byte(msg)
-		err = producer.Publish(topicName, msgBody)
+		err = producer.Publish(qd.SourceDB, msgBody)
 
 		if err != nil {
 			log.Fatal(err)

@@ -18,11 +18,11 @@ var (
 )
 
 // StartConsumer :)
-func StartConsumer() {
+func StartConsumer(qd *QueueDaemon) {
 	nsqconfig := nsq.NewConfig()
 	consumer, err := nsq.NewConsumer(
-		env.Params.NSQTopic,
-		"consumer",
+		qd.SourceDB,
+		qd.SourceCollection,
 		nsqconfig,
 	)
 

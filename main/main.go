@@ -30,7 +30,13 @@ func main() {
 
 	elasticserviceprovider.FindOrCreateIndices(persistance.GetElasticClient())
 
-	go queue.StartProducer()
+	qd := queue.QueueDaemon{
+		SourceDB:         "mongodb.fluffy",
+		SourceCollection: "buffy",
+		ReplicationIndex: env.Params.ReplicationIndex,
+	}
 
-	queue.StartConsumer()
+	go queue.StartProducer(&qd)
+
+	queue.StartConsumer(&qd)
 }
