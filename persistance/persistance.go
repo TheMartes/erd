@@ -13,21 +13,17 @@ var (
 )
 
 func GetElasticClient() *elasticsearch.Client {
-	if elasticClient != nil {
-		return elasticClient
+	if elasticClient == nil {
+		elasticClient = elasticserviceprovider.Elastic{}.GetClient()
 	}
-
-	elasticClient = elasticserviceprovider.Elastic{}.GetClient()
 
 	return elasticClient
 }
 
 func GetMongoClient() *mongo.Client {
-	if mongoClient != nil {
-		return mongoClient
+	if mongoClient == nil {
+		mongoClient = mongoserviceprovider.Mongo{}.GetClient()
 	}
-
-	mongoClient = mongoserviceprovider.Mongo{}.GetClient()
 
 	return mongoClient
 }

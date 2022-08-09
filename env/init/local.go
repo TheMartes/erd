@@ -1,4 +1,4 @@
-package environments
+package initenv
 
 import (
 	"context"
@@ -11,11 +11,8 @@ import (
 	"github.com/themartes/erd/replication"
 )
 
-// Local :)
-type Local struct{}
-
-// InitLocalEnv :))
-func (l Local) InitLocalEnv() {
+// Local env initialization
+func InitLocal() {
 	mongoClient := persistance.GetMongoClient()
 	arr := replication.GenerateFakeData(10000)
 

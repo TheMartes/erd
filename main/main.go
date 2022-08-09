@@ -4,8 +4,8 @@ import (
 	"log"
 	"runtime"
 
-	"github.com/themartes/erd/env"
-	"github.com/themartes/erd/environments"
+	env "github.com/themartes/erd/env"
+	initenv "github.com/themartes/erd/env/init"
 	"github.com/themartes/erd/persistance"
 	elasticserviceprovider "github.com/themartes/erd/persistance/elasticsearch"
 	"github.com/themartes/erd/queue"
@@ -19,7 +19,7 @@ func main() {
 	log.Println("Number of Workers:", numberOfCores)
 
 	if env.Params.AppEnv == "dev" {
-		environments.Local{}.InitLocalEnv()
+		initenv.InitLocal()
 	}
 
 	_, err := persistance.GetElasticClient().Indices.Delete([]string{"_all"}) // @Refactor
