@@ -5,8 +5,7 @@ import (
 	"log"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/persistance"
 	mongoserviceprovider "github.com/themartes/erd/persistance/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,8 +13,8 @@ import (
 
 // Start producer
 func StartProducer() {
-	db := config.GetEnvValue(envparams.MongoDB)
-	collection := config.GetEnvValue(envparams.MongoCollection)
+	db := env.Params.MongoDB
+	collection := env.Params.MongoCollection
 
 	mongoClient := persistance.GetMongoClient()
 	mongoCollection := mongoserviceprovider.GetCollectionFromDB(mongoClient, db, collection)
@@ -38,14 +37,14 @@ func StartProducer() {
 	}
 
 	nsqconfig := nsq.NewConfig()
-	producerURL := config.GetEnvValue(envparams.NSQProducerURL)
+	producerURL := env.Params.NSQProducerURL
 	producer, err := nsq.NewProducer(producerURL, nsqconfig)
 
 	if err != nil {
 		log.Fatalf("err occured %s", err)
 	}
 
-	topicName := config.GetEnvValue(envparams.NSQTopic)
+	topicName := env.Params.NSQTopic
 
 	for _, msg := range producerData {
 		msgBody := []byte(msg)
@@ -60,14 +59,14 @@ func StartProducer() {
 // Populate for local development
 func Populate(data []string) {
 	nsqconfig := nsq.NewConfig()
-	producerURL := config.GetEnvValue(envparams.NSQProducerURL)
+	producerURL := env.Params.NSQProducerURL
 	producer, err := nsq.NewProducer(producerURL, nsqconfig)
 
 	if err != nil {
 		log.Fatalf("err occured %s", err)
 	}
 
-	topicName := config.GetEnvValue(envparams.NSQTopic)
+	topicName := env.Params.NSQTopic
 
 	for _, msg := range data {
 		msgBody := []byte(msg)

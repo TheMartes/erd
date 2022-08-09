@@ -4,8 +4,7 @@ import (
 	"log"
 	"runtime"
 
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/environments"
 	"github.com/themartes/erd/persistance"
 	elasticserviceprovider "github.com/themartes/erd/persistance/elasticsearch"
@@ -19,7 +18,7 @@ var (
 func main() {
 	log.Println("Number of Workers:", numberOfCores)
 
-	if config.GetEnvValue(envparams.AppEnv) == "dev" {
+	if env.Params.AppEnv == "dev" {
 		environments.Local{}.InitLocalEnv()
 	}
 

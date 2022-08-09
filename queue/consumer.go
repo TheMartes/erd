@@ -8,8 +8,7 @@ import (
 	"syscall"
 
 	"github.com/nsqio/go-nsq"
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/replication"
 )
 
@@ -22,7 +21,7 @@ var (
 func StartConsumer() {
 	nsqconfig := nsq.NewConfig()
 	consumer, err := nsq.NewConsumer(
-		config.GetEnvValue(envparams.NSQTopic),
+		env.Params.NSQTopic,
 		"consumer",
 		nsqconfig,
 	)
@@ -41,7 +40,7 @@ func StartConsumer() {
 		return nil
 	}), runtime.NumCPU())
 
-	err = consumer.ConnectToNSQLookupd(config.GetEnvValue(envparams.NSQLookupDaemonURL))
+	err = consumer.ConnectToNSQLookupd(env.Params.NSQLookupDaemonURL)
 
 	if err != nil {
 		log.Fatal(err)

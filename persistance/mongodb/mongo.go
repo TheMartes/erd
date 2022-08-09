@@ -6,8 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -42,9 +41,9 @@ func GetCollectionFromDB(client *mongo.Client, db string, collection string) *mo
 }
 
 func buildMongoURI() string {
-	url := config.GetEnvValue(envparams.MongoUrl)
-	username := config.GetEnvValue(envparams.MongoUsername)
-	password := config.GetEnvValue(envparams.MongoPassword)
+	url := env.Params.MongoUrl
+	username := env.Params.MongoUsername
+	password := env.Params.MongoPassword
 
 	return fmt.Sprintf("mongodb://%s:%s@%s", username, password, url)
 }

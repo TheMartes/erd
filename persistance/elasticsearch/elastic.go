@@ -5,13 +5,13 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 )
 
 type Elastic struct{}
 
 func (e Elastic) GetClient() *elasticsearch.Client {
-	es, err := elasticsearch.NewClient(config.Cfg)
+	es, err := elasticsearch.NewClient(config.ElasticSearch)
 
 	if err != nil {
 		log.Fatalf("Error creating client: %s", err)
@@ -21,7 +21,7 @@ func (e Elastic) GetClient() *elasticsearch.Client {
 }
 
 func FindOrCreateIndices(es *elasticsearch.Client) {
-	name := config.GetEnvValue(envparams.ReplicationIndex)
+	name := env.Params.ReplicationIndex
 
 	_, err := es.Indices.Create(name)
 

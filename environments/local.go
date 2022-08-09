@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/persistance"
 	mongoserviceprovider "github.com/themartes/erd/persistance/mongodb"
 	"github.com/themartes/erd/replication"
@@ -18,8 +17,8 @@ type Local struct{}
 // InitLocalEnv :))
 func (l Local) InitLocalEnv() {
 	mongoClient := persistance.GetMongoClient()
-	db := config.GetEnvValue(envparams.MongoDB)
-	collection := config.GetEnvValue(envparams.MongoCollection)
+	db := env.Params.MongoDB
+	collection := env.Params.MongoCollection
 	arr := replication.GenerateFakeData(10000)
 
 	mongoClient.Database(db).Collection(collection).Drop(context.TODO())

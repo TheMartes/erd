@@ -9,8 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v7/esutil"
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/persistance"
 )
 
@@ -22,7 +21,7 @@ func ReplicateBulkIndex(replicationData []string) {
 		err             error
 	)
 
-	indicesName := config.GetEnvValue(envparams.ReplicationIndex)
+	indicesName := env.Params.ReplicationIndex
 	client := persistance.GetElasticClient()
 
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
