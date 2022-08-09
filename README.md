@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/TheMartes/erd/readme-update/.github/readme/logo.png" width="400"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TheMartes/erd/master/.github/readme/logo.png" width="400"></p>
 
 # ERD - Elasticsearch Replication Daemon
 
