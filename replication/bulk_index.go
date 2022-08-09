@@ -5,20 +5,25 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"strconv"
+	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v7/esutil"
+	"github.com/themartes/erd/env"
+	"github.com/themartes/erd/persistance"
 )
 
 // ReplicateBulkIndex :)
-func ReplicateBulkIndex(data []string) {
+func ReplicateBulkIndex(replicationData []string) {
 	var (
 		docs            []*Doc
 		countSuccessful uint64
 		err             error
 	)
+
+	indicesName := env.Params.ReplicationIndex
+	client := persistance.GetElasticClient()
 
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
 		Index:         indicesName,
@@ -32,10 +37,10 @@ func ReplicateBulkIndex(data []string) {
 		log.Fatalf("Error creating the indexer: %s", err)
 	}
 
-	for i := 0; i < len(data); i++ {
+	for i := 0; i < len(replicationData); i++ {
 		docs = append(docs, &Doc{
 			ID:    i,
-			Title: data[i],
+			Title: replicationData[i],
 		})
 	}
 
@@ -53,9 +58,8 @@ func ReplicateBulkIndex(data []string) {
 		err = bi.Add(
 			context.Background(),
 			esutil.BulkIndexerItem{
-				Action:     "index",
-				DocumentID: strconv.Itoa(a.ID),
-				Body:       bytes.NewReader(data),
+				Action: "index",
+				Body:   bytes.NewReader(data),
 				OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
 					atomic.AddUint64(&countSuccessful, 1)
 				},
@@ -79,5 +83,11 @@ func ReplicateBulkIndex(data []string) {
 
 	dur := time.Since(start).Milliseconds()
 
-	log.Println("Replication of", len(data), "documents Done in", dur, "ms")
+	log.Println("Replication of", bi.Stats().NumIndexed, "documents Done in", dur, "ms")
+}
+
+func PutReplicateBulkIndexToWG(replicationData []string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	ReplicateBulkIndex(replicationData)
 }

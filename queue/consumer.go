@@ -1,38 +1,28 @@
 package queue
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"syscall"
 	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/nsqio/go-nsq"
-	"github.com/themartes/erd/config"
-	"github.com/themartes/erd/config/envparams"
+	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/replication"
 )
 
 var (
-	bufferSize = 20000
+	bufferSize = 2000
 	msgBuffer  []string
+	timeout    = time.Now()
 )
 
 // StartConsumer :)
-func StartConsumer() {
-	nsqconfig := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer(
-		config.GetEnvValue(envparams.NSQTopic),
-		"consumer",
-		nsqconfig,
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func StartConsumer(engine string, sourcedb string, collection string, consumer *nsq.Consumer) {
 	consumer.AddConcurrentHandlers(nsq.HandlerFunc(func(m *nsq.Message) error {
 		if len(m.Body) == 0 {
 			return nil
@@ -43,7 +33,16 @@ func StartConsumer() {
 		return nil
 	}), runtime.NumCPU())
 
-	err = consumer.ConnectToNSQLookupd(config.GetEnvValue(envparams.NSQLookupDaemonURL))
+	cron := gocron.NewScheduler(time.UTC)
+	_, cronErr := cron.Every(5).Seconds().Do(idleQueueCheck)
+
+	if cronErr != nil {
+		log.Fatal(cronErr)
+	}
+
+	cron.StartAsync()
+
+	err := consumer.ConnectToNSQLookupd(env.Params.NSQLookupDaemonURL)
 
 	if err != nil {
 		log.Fatal(err)
@@ -66,11 +65,29 @@ func processMessage(payload string) {
 		// Clear buffer
 		msgBuffer = []string{}
 
-		start := time.Now().UTC()
+		go replication.ReplicateBulkIndex(data)
 
-		replication.ReplicateBulkIndex(data)
+		timeout = time.Now()
+	}
+}
 
-		dur := time.Since(start).Milliseconds()
-		fmt.Println("Cycle done in", dur, "ms")
+func idleQueueCheck() {
+	queueTimeout, err := strconv.Atoi(env.Params.NSQForceMessageProcessingTimeout)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if time.Since(timeout).Seconds() >= float64(queueTimeout) {
+		data := msgBuffer
+
+		// Clear buffer
+		msgBuffer = []string{}
+
+		go replication.ReplicateBulkIndex(data)
+
+		timeout = time.Now()
+
+		log.Println("Queue population not high enough, forcing message processing...")
 	}
 }

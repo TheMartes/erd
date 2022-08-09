@@ -26,7 +26,7 @@ func SplitIntoChunks(data []string) []Chunk {
 			output[chunk].Data = append(output[chunk].Data, data[threshold+i])
 		}
 
-		threshold = threshold + chunkLen
+		threshold += chunkLen
 	}
 
 	return output

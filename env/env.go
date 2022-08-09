@@ -1,4 +1,4 @@
-package config
+package env
 
 import (
 	"log"
@@ -11,7 +11,7 @@ const (
 	ep string = ".env"
 )
 
-func GetEnvValue(param string) string {
+func getValue(param string) string {
 	err := godotenv.Load(ep)
 
 	if err != nil {

@@ -11,6 +11,8 @@ services:
     depends_on:
       - elastic
 
+  # Just for development
+  # --------------------
   elastic:
     image: docker.io/bitnami/elasticsearch:7
     ports:
@@ -41,6 +43,14 @@ services:
       - nsqlookupd
     ports:
       - "4171:4171"
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
 
 volumes:
   elasticsearch_data:

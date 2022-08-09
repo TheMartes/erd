@@ -1,11 +1,26 @@
 package replication
 
 import (
-	"github.com/elastic/go-elasticsearch/v7"
-	esp "github.com/themartes/erd/serviceprovider/elasticsearch"
+	"runtime"
+	"sync"
+
+	"github.com/themartes/erd/helpers"
+	"github.com/themartes/erd/persistance"
+	mongoserviceprovider "github.com/themartes/erd/persistance/mongodb"
 )
 
-var (
-	client      *elasticsearch.Client = esp.GetClient()
-	indicesName string
-)
+func InitialLoad(engine string, sourcedb string, collection string, wg *sync.WaitGroup) {
+	mongoClient := persistance.GetMongoClient()
+	mongoCollection := mongoserviceprovider.GetCollectionFromDB(mongoClient, sourcedb, collection)
+
+	data := mongoserviceprovider.GetDataFromCursor(mongoCollection)
+
+	chunks := helpers.SplitIntoChunks(data)
+
+	for i := 0; i < runtime.NumCPU(); i++ {
+		chunk := chunks[i]
+		go PutReplicateBulkIndexToWG(chunk.Data, wg)
+	}
+
+	wg.Wait()
+}

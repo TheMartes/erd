@@ -1,14 +1,17 @@
-package esp
+package elasticserviceprovider
 
 import (
 	"log"
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/themartes/erd/config"
+	"github.com/themartes/erd/env"
 )
 
-func GetClient() *elasticsearch.Client {
-	es, err := elasticsearch.NewClient(config.Cfg)
+type Elastic struct{}
+
+func (e Elastic) GetClient() *elasticsearch.Client {
+	es, err := elasticsearch.NewClient(config.ElasticSearch)
 
 	if err != nil {
 		log.Fatalf("Error creating client: %s", err)
@@ -17,8 +20,8 @@ func GetClient() *elasticsearch.Client {
 	return es
 }
 
-func FindOrCreateIndices(name string) {
-	es := GetClient()
+func FindOrCreateIndices(es *elasticsearch.Client) {
+	name := env.Params.ReplicationIndex
 
 	_, err := es.Indices.Create(name)
 
