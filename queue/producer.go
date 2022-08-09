@@ -10,8 +10,16 @@ import (
 	mongoserviceprovider "github.com/themartes/erd/persistance/mongodb"
 )
 
+var dataProductionInProgress bool
+
 // Start producer
 func StartProducer(dbengine string, sourcedb string, producer *nsq.Producer) {
+	if dataProductionInProgress {
+		return
+	}
+
+	dataProductionInProgress = true
+
 	db := env.Params.MongoDB
 	collection := env.Params.MongoCollection
 
@@ -30,6 +38,8 @@ func StartProducer(dbengine string, sourcedb string, producer *nsq.Producer) {
 			log.Fatal(err)
 		}
 	}
+
+	dataProductionInProgress = false
 }
 
 // Populate for local development

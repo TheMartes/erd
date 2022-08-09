@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/nsqio/go-nsq"
 	"github.com/themartes/erd/config"
 	"github.com/themartes/erd/env"
@@ -73,6 +74,15 @@ func (worker ReplicationWorker) StartReplication() {
 		log.Println("Initial load done in", endIntialLoad, "ms")
 	}
 
-	go queue.StartProducer(worker.DBEngine, worker.SourceDB, worker.NSQProducer)
+	producerCron := gocron.NewScheduler(time.UTC)
+	_, err := producerCron.Every(1).Seconds().Do(func() {
+		go queue.StartProducer(worker.DBEngine, worker.SourceDB, worker.NSQProducer)
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	producerCron.StartAsync()
 	queue.StartConsumer(worker.DBEngine, worker.SourceDB, worker.SourceCollection, worker.NSQConsumer)
 }
