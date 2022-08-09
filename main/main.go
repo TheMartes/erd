@@ -1,64 +1,35 @@
 package main
 
 import (
-	"context"
 	"log"
-	"strconv"
-	"strings"
-	"sync"
+	"runtime"
 
-	"github.com/bxcodec/faker/v3"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
-	"github.com/themartes/offer-search/config"
-	"github.com/themartes/offer-search/replication"
-	"github.com/themartes/offer-search/servicedaemon"
+	env "github.com/themartes/erd/env"
+	initenv "github.com/themartes/erd/env/init"
+	"github.com/themartes/erd/persistance"
+	elasticserviceprovider "github.com/themartes/erd/persistance/elasticsearch"
+	"github.com/themartes/erd/worker"
+)
+
+var (
+	numberOfCores = runtime.NumCPU()
 )
 
 func main() {
-	config.InitEnv()
+	log.Println("Number of Workers:", numberOfCores)
 
-	client := servicedaemon.GetElasticClient()
-	indicesName := faker.Word()
-
-	// this will create github indices
-	servicedaemon.ConfigureDaemon(indicesName)
-
-	var fakeTitles []string
-
-	for i := 0; i < 500; i++ {
-		fakeTitles = append(fakeTitles, faker.Word())
+	if env.Params.AppEnv == "dev" {
+		initenv.InitLocal()
 	}
 
-	wg := sync.WaitGroup{}
+	_, err := persistance.GetElasticClient().Indices.Delete([]string{"_all"}) // @Refactor
 
-	for index, title := range fakeTitles {
-		wg.Add(1)
-
-		go func(index int, title string, indicesName string) {
-			defer wg.Done()
-
-			var b strings.Builder
-			b.WriteString(`{"title" : "`)
-			b.WriteString(title)
-			b.WriteString(`"}`)
-
-			req := esapi.IndexRequest{
-				Index:      indicesName,
-				DocumentID: strconv.Itoa(index),
-				Body:       strings.NewReader(b.String()),
-			}
-
-			res, err := req.Do(context.Background(), client)
-
-			if err != nil {
-				log.Fatalf("err %s", err)
-			}
-
-			defer res.Body.Close()
-		}(index, title, indicesName)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	wg.Wait()
+	elasticserviceprovider.FindOrCreateIndices(persistance.GetElasticClient())
 
-	replication.StartReplicationDaemon()
+	worker := worker.CreateReplicationWorker("mongodb", "fluffy", "buffy", "erd", true)
+	worker.StartReplication()
 }

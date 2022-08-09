@@ -1,7 +1,7 @@
 package replication
 
-import "fmt"
-
-func StartReplicationDaemon() {
-	fmt.Println("Getting Elastic Instance")
+// Doc struct for replicated documents
+type Doc struct {
+	ID    int    `json:"id"`
+	Title string `json:"title"`
 }
