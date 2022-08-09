@@ -34,7 +34,11 @@ func StartConsumer(engine string, sourcedb string, collection string, consumer *
 	}), runtime.NumCPU())
 
 	cron := gocron.NewScheduler(time.UTC)
-	cron.Every(5).Seconds().Do(idleQueueCheck)
+	_, cronErr := cron.Every(5).Seconds().Do(idleQueueCheck)
+
+	if cronErr != nil {
+		log.Fatal(cronErr)
+	}
 
 	cron.StartAsync()
 

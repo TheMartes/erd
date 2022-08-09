@@ -30,6 +30,6 @@ func main() {
 
 	elasticserviceprovider.FindOrCreateIndices(persistance.GetElasticClient())
 
-	worker := worker.CreateReplicationWorker("mongodb", "fluffy", "buffy", "erd")
+	worker := worker.CreateReplicationWorker("mongodb", "fluffy", "buffy", "erd", true)
 	worker.StartReplication()
 }

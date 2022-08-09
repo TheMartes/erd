@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"context"
 	"fmt"
 	"log"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/themartes/erd/env"
 	"github.com/themartes/erd/persistance"
 	mongoserviceprovider "github.com/themartes/erd/persistance/mongodb"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Start producer
@@ -20,28 +18,13 @@ func StartProducer(dbengine string, sourcedb string, producer *nsq.Producer) {
 	mongoClient := persistance.GetMongoClient()
 	mongoCollection := mongoserviceprovider.GetCollectionFromDB(mongoClient, db, collection)
 
-	mongoData, err := mongoCollection.Find(context.TODO(), bson.D{})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var results []map[string]interface{}
-	if err = mongoData.All(context.TODO(), &results); err != nil {
-		log.Fatal(err)
-	}
-
-	var producerData []string
-
-	for _, result := range results {
-		producerData = append(producerData, result["title"].(string))
-	}
+	producerData := mongoserviceprovider.GetDataFromCursor(mongoCollection)
 
 	topicName := fmt.Sprintf("%s.%s", dbengine, sourcedb)
 
 	for _, msg := range producerData {
 		msgBody := []byte(msg)
-		err = producer.Publish(topicName, msgBody)
+		err := producer.Publish(topicName, msgBody)
 
 		if err != nil {
 			log.Fatal(err)

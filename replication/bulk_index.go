@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -83,4 +84,10 @@ func ReplicateBulkIndex(replicationData []string) {
 	dur := time.Since(start).Milliseconds()
 
 	log.Println("Replication of", bi.Stats().NumIndexed, "documents Done in", dur, "ms")
+}
+
+func PutReplicateBulkIndexToWG(replicationData []string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	ReplicateBulkIndex(replicationData)
 }
