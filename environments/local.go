@@ -17,14 +17,30 @@ type Local struct{}
 // InitLocalEnv :))
 func (l Local) InitLocalEnv() {
 	mongoClient := persistance.GetMongoClient()
-	db := env.Params.MongoDB
-	collection := env.Params.MongoCollection
 	arr := replication.GenerateFakeData(10000)
 
-	mongoClient.Database(db).Collection(collection).Drop(context.TODO())
-	mongoClient.Database(db).CreateCollection(context.TODO(), collection)
+	dropErr := mongoClient.Database(env.Params.MongoDB).
+		Collection(env.Params.MongoCollection).
+		Drop(context.TODO())
 
-	instance := mongoserviceprovider.GetCollectionFromDB(mongoClient, db, collection)
+	if dropErr != nil {
+		log.Print(dropErr)
+	}
+
+	createErr := mongoClient.Database(env.Params.MongoDB).CreateCollection(
+		context.TODO(),
+		env.Params.MongoCollection,
+	)
+
+	if createErr != nil {
+		log.Print(createErr)
+	}
+
+	instance := mongoserviceprovider.GetCollectionFromDB(
+		mongoClient,
+		env.Params.MongoDB,
+		env.Params.MongoCollection,
+	)
 
 	models := replication.ConvertToMongoCompatible(arr)
 
