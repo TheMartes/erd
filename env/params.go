@@ -13,6 +13,7 @@ type envParams struct {
 	MongoCollection                  string
 	MongoDB                          string
 	NSQForceMessageProcessingTimeout string
+	NSQProductionTimeout             string
 }
 
 var Params = envParams{
@@ -28,4 +29,5 @@ var Params = envParams{
 	MongoCollection:                  getValue("MONGO_COLLECTION"),
 	MongoDB:                          getValue("MONGO_DB"),
 	NSQForceMessageProcessingTimeout: getValue("NSQ_FORCE_MESSAGE_PROCESSING_TIMEOUT"),
+	NSQProductionTimeout:             getValue("NSQ_PRODUCTION_TIMEOUT"),
 }

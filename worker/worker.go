@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"strconv"
 	"sync"
 	"time"
 
@@ -75,7 +76,13 @@ func (worker ReplicationWorker) StartReplication() {
 	}
 
 	producerCron := gocron.NewScheduler(time.UTC)
-	_, err := producerCron.Every(1).Seconds().Do(func() {
+	interval, ConvErr := strconv.Atoi(env.Params.NSQProductionTimeout)
+
+	if ConvErr != nil {
+		log.Fatal(ConvErr)
+	}
+
+	_, err := producerCron.Every(interval).Seconds().Do(func() {
 		go queue.StartProducer(worker.DBEngine, worker.SourceDB, worker.NSQProducer)
 	})
 
