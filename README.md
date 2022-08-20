@@ -2,7 +2,8 @@
 
 # ERD - Elasticsearch Replication Daemon
 
-fast, scalable & resilient replication daemon for elasticsearch
+fast, scalable & resilient replication daemon for elasticsearch<br />
+**Please note this is still Work In Progress Do not use for prod use at all**
 
 ## Features
 
@@ -13,7 +14,7 @@ fast, scalable & resilient replication daemon for elasticsearch
 
 \*\* Initial load can process up to 1 Milion messagges per second, Queue consumption performance depends on your hardware
 
-## Prerequisites
+## Prerequisites for production use
 
 -   [NSQ Cluster](https://nsq.io/)
 -   [Redis](https://redis.com/)
@@ -21,15 +22,19 @@ fast, scalable & resilient replication daemon for elasticsearch
 
 ## Local Development
 
-Local Development is powered by docker. Please see `Makefile` to get you up & running quickly. For local development be sure to set `APP_ENV=dev` in `.env`.
+Local Development is powered by [Docker](https://www.docker.com/). Please see `Makefile` to get you up & running quickly. For local development be sure to set `APP_ENV=dev` in `.env`.
 
-### .env
+**ENV Types**<br/>
+`dist`: .env file with all options you can configure, use for custom configuration<br />
+`local`: jump start for local development
 
-To successfully start daemon you need to set your `.env` variables. All of the required variables could be found in `.env.dist`
+> **Tip:** You can just do `cp .env.local .env` to use preconfigured settings
+
+**To learn more** about local environment please refer to [this wiki](https://github.com/TheMartes/erd/wiki/Local-Development)
 
 ### Running the project
 
-After everything is set just run `make up`
+Please refer to `Makefile`. It has all of the commands available to you to run the project in different modes.
 
 ## DIY
 
@@ -38,6 +43,10 @@ By default daemon is handling replication from DB to NSQ so consumer can process
 ## Roadmap
 
 Our roadmap could be found here. [ERD | Notion](https://www.notion.so/martes/fde8f651f54c47988bfd4e1bed386a06?v=e777c6f286e643808375a10a8135ed1d)
+
+## Contributions
+
+If you feel like you want to help me, please, pick an issue from [notion](https://www.notion.so/martes/fde8f651f54c47988bfd4e1bed386a06?v=e777c6f286e643808375a10a8135ed1d) which is not assigned and is in to-do column and create new issue here on github, tagging me for more information.
 
 ## License
 
