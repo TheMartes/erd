@@ -37,7 +37,7 @@ By default daemon is handling replication from DB to NSQ so consumer can process
 
 ## Roadmap
 
-Our roadmap could be found here. [ERD | Height App](https://height.app/FqK7WCMWtj/daemon)
+Our roadmap could be found here. [ERD | Notion](https://www.notion.so/martes/fde8f651f54c47988bfd4e1bed386a06?v=e777c6f286e643808375a10a8135ed1d)
 
 ## License
 
