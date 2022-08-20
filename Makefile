@@ -8,24 +8,30 @@ endif
 .DEFAULT_GOAL:=help
 
 ##@ Development
-.PHONY: up down build run-cli fresh-start
-up: ## Start the application containers (use "args=" to supply custom arguments)
+.PHONY: up down run-cli rebuild
+run: ## Start the daemon & infrastructure containers (use "args=" to supply custom arguments)
 	docker-compose up $(args)
 
-down: ## Stop and remove the application containers
+stop: ## Stop and remove the application containers
 	docker-compose down --volumes
 
-build: ## Build docker container
-	docker-compose up --build
-
-run-cli: ## Get into container
+run-cli: ## Get into daemon container
 	docker-compose run --rm app bash
 
-fresh-start: ## ️🌿 Ceate new fresh containers
+rebuild: ## Rebuild Docker Containers
+	docker-compose down --volumes && \
 	docker-compose rm --all && \
 	docker-compose pull && \
 	docker-compose build --no-cache && \
 	docker-compose up --force-recreate
+
+##@ Miscellaneous
+.PHONY: run-bare run-infrastructure
+run-bare: ## Start only daemon, assuming youre infrastructure is running already (use "args=" to supply custom arguments)
+	docker-compose up app $(args)
+
+run-infrastructure: ## Start infrastructure (good for local env)
+	docker-compose up -d elastic nsqlookupd nsqd nsqadmin mongo $(args)
 
 ##@ Help
 .PHONY: help
