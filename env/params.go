@@ -14,6 +14,9 @@ type envParams struct {
 	MongoDB                          string
 	NSQForceMessageProcessingTimeout string
 	NSQProductionTimeout             string
+	RedisURL                         string
+	RedisPassword                    string
+	RedisDB                          string
 }
 
 var Params = envParams{
@@ -30,4 +33,7 @@ var Params = envParams{
 	MongoDB:                          getValue("MONGO_DB"),
 	NSQForceMessageProcessingTimeout: getValue("NSQ_FORCE_MESSAGE_PROCESSING_TIMEOUT"),
 	NSQProductionTimeout:             getValue("NSQ_PRODUCTION_TIMEOUT"),
+	RedisURL:                         getValue("REDIS_URL"),
+	RedisPassword:                    getValue("REDIS_PASSWORD"),
+	RedisDB:                          getValue("REDIS_DB"),
 }

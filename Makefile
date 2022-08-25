@@ -31,7 +31,7 @@ run-bare: ## Start only daemon, assuming youre infrastructure is running already
 	docker-compose up app $(args)
 
 run-infrastructure: ## Start infrastructure (good for local env)
-	docker-compose up -d elastic nsqlookupd nsqd nsqadmin mongo $(args)
+	docker-compose up -d elastic nsqlookupd nsqd nsqadmin mongo redis-devel $(args)
 
 ##@ Help
 .PHONY: help

@@ -52,6 +52,13 @@ services:
     ports:
       - "27017:27017"
 
+  redis-devel:
+    image: redis:latest
+    restart: always
+    hostname: redis
+    ports:
+      - "6379:6379"
+
 volumes:
   elasticsearch_data:
     driver: local
